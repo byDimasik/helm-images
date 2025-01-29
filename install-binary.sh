@@ -43,10 +43,10 @@ function download_plugin() {
   version=$(grep version "$HELM_PLUGIN_DIR/plugin.yaml" | cut -d'"' -f2)
   old=$(isOld "$version" "0.0.5")
   if [ "$old" == "yes" ]; then
-    DOWNLOAD_URL="https://github.com/nikhilsbhat/helm-images/releases/download/v$version/helm-images_${version}_${osName}_${osArch}.zip"
+    DOWNLOAD_URL="https://github.com/byDimasik/helm-images/releases/download/v$version/helm-images_${version}_${osName}_${osArch}.zip"
     OUTPUT_BASENAME_WITH_POSTFIX="$HELM_PLUGIN_DIR/$OUTPUT_BASENAME.zip"
   else
-    DOWNLOAD_URL="https://github.com/nikhilsbhat/helm-images/releases/download/v$version/helm-images_${version}_${osName}_${osArch}.tar.gz"
+    DOWNLOAD_URL="https://github.com/byDimasik/helm-images/releases/download/v$version/helm-images_${version}_${osName}_${osArch}.tar.gz"
     OUTPUT_BASENAME_WITH_POSTFIX="$HELM_PLUGIN_DIR/$OUTPUT_BASENAME.tar.gz"
   fi
 

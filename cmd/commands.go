@@ -9,8 +9,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nikhilsbhat/helm-images/pkg"
-	"github.com/nikhilsbhat/helm-images/version"
+	"github.com/byDimasik/helm-images/pkg"
+	"github.com/byDimasik/helm-images/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

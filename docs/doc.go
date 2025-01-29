@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/nikhilsbhat/helm-images/cmd"
+	"github.com/byDimasik/helm-images/cmd"
 	"github.com/spf13/cobra/doc"
 )
 

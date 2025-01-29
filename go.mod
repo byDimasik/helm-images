@@ -1,4 +1,4 @@
-module github.com/nikhilsbhat/helm-images
+module github.com/byDimasik/helm-images
 
 go 1.23.4
 

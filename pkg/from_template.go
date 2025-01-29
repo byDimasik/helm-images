@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strings"
 
-	imageErr "github.com/nikhilsbhat/helm-images/pkg/errors"
+	imageErr "github.com/byDimasik/helm-images/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 

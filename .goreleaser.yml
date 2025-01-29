@@ -1,33 +1,29 @@
-# This is an example .goreleaser.yml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
+env:
+  - GO111MODULE=on
+
 before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
+    - go mod download
+    - go mod vendor
 
 builds:
   - env:
       - CGO_ENABLED=0
     flags:
       - -trimpath
+      - -mod=vendor
     ldflags:
-      - -s -w
-        -X github.com/byDimasik/helm-images/version.Version={{.Version}}
-        -X github.com/byDimasik/helm-images/version.Env={{.Env.BUILD_ENVIRONMENT}}
-        -X github.com/byDimasik/helm-images/version.BuildDate={{.Date}}
-        -X github.com/byDimasik/helm-images/version.Revision={{.Commit}}
-        -X github.com/byDimasik/helm-images/version.GoVersion={{.Env.GOVERSION}}
-        -X github.com/byDimasik/helm-images/version.Platform={{ .Os }}/{{ .Arch }}
+      - -s -w -X "github.com/byDimasik/helm-images/version.Version={{.Version}}" -X "github.com/byDimasik/helm-images/version.Env={{.Env.BUILD_ENVIRONMENT}}" -X "github.com/byDimasik/helm-images/version.BuildDate={{.Date}}" -X "github.com/byDimasik/helm-images/version.Revision={{.Commit}}" -X "github.com/byDimasik/helm-images/version.GoVersion={{.Env.GOVERSION}}" -X "github.com/byDimasik/helm-images/version.Platform={{ .Os }}/{{ .Arch }}"
     goos:
       - linux
       - darwin
-      - freebsd
-      - windows
     goarch:
       - amd64
-      - '386'
-      - arm
       - arm64
+    tags:
+      - netgo
     binary: '{{ .ProjectName }}'
 
 archives:
@@ -52,17 +48,6 @@ checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
 
-signs:
-  - artifacts: checksum
-    args:
-      - "--batch"
-      - "--local-user"
-      - "{{ .Env.GPG_FINGERPRINT }}" # set this environment variable for your signing key
-      - "--output"
-      - "${signature}"
-      - "--detach-sign"
-      - "${artifact}"
-
 changelog:
   sort: asc
   filters:
@@ -70,3 +55,9 @@ changelog:
       - '^docs:'
       - '^test:'
 
+release:
+  # release to the public repository
+  github:
+    owner: byDimasik
+    name: helm-images
+  name_template: "v{{.Version}}"

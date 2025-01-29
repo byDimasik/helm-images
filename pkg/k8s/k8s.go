@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	thanosAlphaV1 "github.com/banzaicloud/thanos-operator/pkg/sdk/api/v1alpha1"
+	imgErrors "github.com/byDimasik/helm-images/pkg/errors"
 	crossplaneV1 "github.com/crossplane/crossplane/apis/pkg/v1"
 	"github.com/ghodss/yaml"
 	grafanaBetaV1 "github.com/grafana-operator/grafana-operator/api/v1beta1"
 	"github.com/nikhilsbhat/common/content"
-	imgErrors "github.com/nikhilsbhat/helm-images/pkg/errors"
 	monitoringV1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"

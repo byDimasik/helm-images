@@ -7,9 +7,9 @@ import (
 	"regexp"
 	"strings"
 
+	imgErrors "github.com/byDimasik/helm-images/pkg/errors"
+	"github.com/byDimasik/helm-images/pkg/k8s"
 	"github.com/nikhilsbhat/common/renderer"
-	imgErrors "github.com/nikhilsbhat/helm-images/pkg/errors"
-	"github.com/nikhilsbhat/helm-images/pkg/k8s"
 	monitoringV1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"

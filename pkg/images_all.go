@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nikhilsbhat/helm-images/pkg/errors"
-	"github.com/nikhilsbhat/helm-images/pkg/k8s"
+	"github.com/byDimasik/helm-images/pkg/errors"
+	"github.com/byDimasik/helm-images/pkg/k8s"
 	"github.com/thoas/go-funk"
 )
 

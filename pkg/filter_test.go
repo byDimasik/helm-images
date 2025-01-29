@@ -3,8 +3,8 @@ package pkg_test
 import (
 	"testing"
 
-	"github.com/nikhilsbhat/helm-images/pkg"
-	"github.com/nikhilsbhat/helm-images/pkg/k8s"
+	"github.com/byDimasik/helm-images/pkg"
+	"github.com/byDimasik/helm-images/pkg/k8s"
 	"github.com/stretchr/testify/assert"
 )
 

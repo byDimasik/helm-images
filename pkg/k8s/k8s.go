@@ -152,6 +152,7 @@ func (dep *Deployments) Get(dataMap string, _ string, _ *logrus.Logger) (*Image,
 	}
 
 	images.Image = append(images.Image, depContainers.getImagesFromArgs()...)
+	images.Image = append(images.Image, depContainers.getImagesFromEnv()...)
 
 	return images, nil
 }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/byDimasik/helm-images/pkg/errors"
 	"github.com/byDimasik/helm-images/pkg/k8s"
-	"github.com/thoas/go-funk"
 )
 
 type skipReleaseInfo struct {
@@ -32,42 +31,7 @@ func (image *Images) GetAllImages() error {
 		skips := image.GetResourcesToSkip()
 
 		for _, kubeKindTemplate := range kubeKindTemplates {
-			currentManifestName, err := k8s.NewName().Get(kubeKindTemplate, image.log)
-			if err != nil {
-				return err
-			}
-
-			currentKind, err := k8s.NewKind().Get(kubeKindTemplate, image.log)
-			if err != nil {
-				return err
-			}
-
-			if !funk.Contains(image.Kind, currentKind) {
-				image.log.Debugf("either helm-images plugin does not support kind '%s' "+
-					"at the moment or manifest might not have images to filter", currentKind)
-
-				continue
-			}
-
-			shouldSkip := false
-
-			for _, skip := range skips {
-				if skip.Name == strings.ToLower(currentManifestName) && skip.Kind == strings.ToLower(currentKind) {
-					image.log.Debugf("Skipping '%s' bearing name '%s' since it is set to skip.", currentKind, currentManifestName)
-
-					shouldSkip = true
-
-					break
-				}
-			}
-
-			if shouldSkip {
-				continue
-			}
-
-			image.log.Debugf("fetching images from '%s' of kind '%s'", currentKind, currentManifestName)
-
-			imagesFound, err := image.GetImage(currentKind, kubeKindTemplate)
+			imagesFound, err := image.collectImagesFromTemplate(kubeKindTemplate, skips)
 			if err != nil {
 				return err
 			}

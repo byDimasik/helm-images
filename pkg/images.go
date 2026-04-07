@@ -9,6 +9,7 @@ import (
 
 	imgErrors "github.com/byDimasik/helm-images/pkg/errors"
 	"github.com/byDimasik/helm-images/pkg/k8s"
+	"github.com/ghodss/yaml"
 	"github.com/nikhilsbhat/common/renderer"
 	monitoringV1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/sirupsen/logrus"
@@ -128,42 +129,7 @@ func (image *Images) GetImages() error {
 	skips := image.GetResourcesToSkip()
 
 	for _, kubeKindTemplate := range kubeKindTemplates {
-		currentManifestName, err := k8s.NewName().Get(kubeKindTemplate, image.log)
-		if err != nil {
-			return err
-		}
-
-		currentKind, err := k8s.NewKind().Get(kubeKindTemplate, image.log)
-		if err != nil {
-			return err
-		}
-
-		if !funk.Contains(image.Kind, currentKind) {
-			image.log.Debugf("either helm-images plugin does not support kind '%s' "+
-				"at the moment or manifest might not have images to filter", currentKind)
-
-			continue
-		}
-
-		shouldSkip := false
-
-		for _, skip := range skips {
-			if skip.Name == strings.ToLower(currentManifestName) && skip.Kind == strings.ToLower(currentKind) {
-				image.log.Debugf("Skipping '%s' bearing name '%s' since it is set to skip.", currentKind, currentManifestName)
-
-				shouldSkip = true
-
-				break
-			}
-		}
-
-		if shouldSkip {
-			continue
-		}
-
-		image.log.Debugf("fetching images from '%s' of kind '%s'", currentKind, currentManifestName)
-
-		imagesFound, err := image.GetImage(currentKind, kubeKindTemplate)
+		imagesFound, err := image.collectImagesFromTemplate(kubeKindTemplate, skips)
 		if err != nil {
 			return err
 		}
@@ -216,6 +182,71 @@ func (image *Images) GetTemplates(template []byte) []string {
 	kinds = kinds[1:]
 
 	return kinds
+}
+
+func (image *Images) collectImagesFromTemplate(kubeKindTemplate string, skips []Skip) ([]*k8s.Image, error) {
+	currentKind, err := k8s.NewKind().Get(kubeKindTemplate, image.log)
+	if err != nil {
+		return nil, err
+	}
+
+	if currentKind == k8s.KindList {
+		return image.collectImagesFromList(kubeKindTemplate, skips)
+	}
+
+	currentManifestName, err := k8s.NewName().Get(kubeKindTemplate, image.log)
+	if err != nil {
+		return nil, err
+	}
+
+	if !funk.Contains(image.Kind, currentKind) {
+		image.log.Debugf("either helm-images plugin does not support kind '%s' "+
+			"at the moment or manifest might not have images to filter", currentKind)
+
+		return nil, nil
+	}
+
+	for _, skip := range skips {
+		if skip.Name == strings.ToLower(currentManifestName) && skip.Kind == strings.ToLower(currentKind) {
+			image.log.Debugf("Skipping '%s' bearing name '%s' since it is set to skip.", currentKind, currentManifestName)
+
+			return nil, nil
+		}
+	}
+
+	image.log.Debugf("fetching images from '%s' of kind '%s'", currentKind, currentManifestName)
+
+	return image.GetImage(currentKind, kubeKindTemplate)
+}
+
+func (image *Images) collectImagesFromList(kubeKindTemplate string, skips []Skip) ([]*k8s.Image, error) {
+	var listManifest map[string]any
+	if err := yaml.Unmarshal([]byte(kubeKindTemplate), &listManifest); err != nil {
+		return nil, err
+	}
+
+	items, itemsExist := listManifest["items"].([]any)
+	if !itemsExist {
+		return nil, &imgErrors.ImageError{Message: "failed to get items from the List manifest"}
+	}
+
+	var images []*k8s.Image
+
+	for _, item := range items {
+		itemManifest, err := yaml.Marshal(item)
+		if err != nil {
+			return nil, err
+		}
+
+		itemImages, err := image.collectImagesFromTemplate(string(itemManifest), skips)
+		if err != nil {
+			return nil, err
+		}
+
+		images = append(images, itemImages...)
+	}
+
+	return images, nil
 }
 
 // GetResourcesToSkip returns the skip from translating the flags.

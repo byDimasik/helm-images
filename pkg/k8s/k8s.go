@@ -21,6 +21,7 @@ import (
 )
 
 const (
+	KindList                    = "List"
 	KindDeployment              = "Deployment"
 	KindStatefulSet             = "StatefulSet"
 	KindDaemonSet               = "DaemonSet"

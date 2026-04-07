@@ -230,7 +230,7 @@ func (image *Images) collectImagesFromList(kubeKindTemplate string, skips []Skip
 		return nil, &imgErrors.ImageError{Message: "failed to get items from the List manifest"}
 	}
 
-	images := make([]*k8s.Image, 0)
+	var images []*k8s.Image
 
 	for _, item := range items {
 		itemManifest, err := yaml.Marshal(item)
